@@ -12,12 +12,18 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <service
-            android:name=".RingFace"
+            android:name=".RingFaceService"
             android:label="@string/analog_name"
             android:permission="android.permission.BIND_WALLPAPER" >
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/watch_face" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview"
+                android:resource="@drawable/bg" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview_circular"
+                android:resource="@drawable/bg" />
             <!-- previews for display: to be added once face is finished (lol)
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
