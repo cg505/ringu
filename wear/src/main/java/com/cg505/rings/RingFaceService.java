@@ -243,7 +243,13 @@ public class RingFaceService extends CanvasWatchFaceService {
             canvas.drawText(dateString, x, y, mDatePaint);
 
 
+            // draw the rings
             float radius = (Math.min(width, height) - 5f) / 2f;
+            if(isInAmbientMode()){
+                // move the rings in so that they don't get moved off screen by
+                // shifting due to burn-in protection
+                radius -= 10f;
+            }
             float centerX = width / 2f;
             float centerY = width / 2f;
             drawRing(centerX, centerY, radius, .4f, canvas);
@@ -278,7 +284,7 @@ public class RingFaceService extends CanvasWatchFaceService {
 
         private void drawRing(float centerX, float centerY, float radius, float percent, Canvas canvas) {
             canvas.drawArc(centerX - radius, centerY - radius, centerX + radius ,centerY + radius,
-                    -90f, 360f * percent - 90f,
+                    -90f, 360f * percent,
                     false,
                     mRingPaint);
         }
