@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import android.os.BatteryManager;
 import android.text.format.DateFormat;
 
 import java.text.SimpleDateFormat;
@@ -56,11 +57,16 @@ public class RingFaceService extends CanvasWatchFaceService {
 
         static final String COLON_STRING = ":";
 
+        // calendar/time and other logic
         Calendar mCalendar;
         Date mDate;
         SimpleDateFormat mDateFormat;
         boolean mShouldDrawColons;
         boolean mRegisteredTimeZoneReceiver = false;
+
+        // battery shenanigans
+        IntentFilter batteryIfilter;
+        Intent batteryStatus;
 
         // device features
         boolean mLowBitAmbient;
@@ -146,6 +152,9 @@ public class RingFaceService extends CanvasWatchFaceService {
             mDateFormat = new SimpleDateFormat(
                     DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEE, MMM d"));
             mDateFormat.setCalendar(mCalendar);
+
+            // battery lolz
+            batteryIfilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         }
 
         @Override
@@ -252,7 +261,7 @@ public class RingFaceService extends CanvasWatchFaceService {
             }
             float centerX = width / 2f;
             float centerY = width / 2f;
-            drawRing(centerX, centerY, radius, .4f, canvas);
+            drawRing(centerX, centerY, radius, batteryPct(), canvas);
             radius -= 5f;
             drawRing(centerX, centerY, radius, .6f, canvas);
         }
@@ -280,6 +289,17 @@ public class RingFaceService extends CanvasWatchFaceService {
             } else {
                 unregisterReceiver();
             }
+        }
+
+
+        private float batteryPct() {
+            // update battery info
+            batteryStatus = RingFaceService.this.registerReceiver(null, batteryIfilter);
+
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+            return level / (float) scale;
         }
 
         private void drawRing(float centerX, float centerY, float radius, float percent, Canvas canvas) {
