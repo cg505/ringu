@@ -15,18 +15,18 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import android.text.format.DateFormat;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.wearable.view.ConfirmationOverlay;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.view.SurfaceHolder;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by cooperc on 12/16/16.
@@ -58,6 +58,7 @@ public class RingFaceService extends CanvasWatchFaceService {
 
         Calendar mCalendar;
         Date mDate;
+        SimpleDateFormat mDateFormat;
         boolean mShouldDrawColons;
         boolean mRegisteredTimeZoneReceiver = false;
 
@@ -72,7 +73,8 @@ public class RingFaceService extends CanvasWatchFaceService {
         Paint mHourPaint;
         Paint mMinutePaint;
         Paint mSecondPaint;
-        int mMinHourColor;
+        Paint mDatePaint;
+        int mMainColor;
         int mSecondColor;
 
         private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -122,17 +124,22 @@ public class RingFaceService extends CanvasWatchFaceService {
             mAmbientBackgroundPaint.setColor(Color.BLACK);
 
             // create graphic styles
-            mMinHourColor = Color.argb(255, 255, 255, 255);
-            mHourPaint = createTextPaint(mMinHourColor);
+            mMainColor = Color.argb(255, 255, 255, 255);
+            mHourPaint = createTextPaint(mMainColor, 80f);
             mHourPaint.setTypeface(BOLD_TYPEFACE);
-            mMinutePaint = createTextPaint(mMinHourColor);
+            mMinutePaint = createTextPaint(mMainColor, 80f);
             mSecondColor = Color.argb(200, 200, 200, 200);
-            mSecondPaint = createTextPaint(mSecondColor);
-            mSecondPaint.setTextSize(50f);
+            mSecondPaint = createTextPaint(mSecondColor, 50f);
+            mDatePaint = createTextPaint(mMainColor, 30f);
+            mDatePaint.setTypeface(BOLD_TYPEFACE);
+
 
             // allocate a Calendar for time calculation etc
             mCalendar = Calendar.getInstance();
             mDate = new Date();
+            mDateFormat = new SimpleDateFormat(
+                    DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEE, MMM d"));
+            mDateFormat.setCalendar(mCalendar);
         }
 
         @Override
@@ -175,10 +182,9 @@ public class RingFaceService extends CanvasWatchFaceService {
             mShouldDrawColons = mCalendar.get(Calendar.MILLISECOND) % 1000 < 500;
 
             int width = bounds.width();
-            final int Y_OFFSET = 180;
 
             // draw the bg first
-            if(!isInAmbientMode()) {
+            if (!isInAmbientMode()) {
                 canvas.drawBitmap(mBackgroundScaledBitmap, 0, 0, null);
             } else {
                 canvas.drawRect(bounds, mAmbientBackgroundPaint);
@@ -186,11 +192,11 @@ public class RingFaceService extends CanvasWatchFaceService {
 
             // make texts
             String hourString;
-            if(is24Hour) {
+            if (is24Hour) {
                 hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
             } else {
                 int hour = mCalendar.get(Calendar.HOUR);
-                if(hour == 0) {
+                if (hour == 0) {
                     hour = 12;
                 }
                 hourString = String.valueOf(hour);
@@ -206,22 +212,28 @@ public class RingFaceService extends CanvasWatchFaceService {
 
             // center HH:MM
             float x = (width - timeWidth) / 2f;
+            float y = 180;
 
             // start rendering
-            canvas.drawText(hourString, x, Y_OFFSET, mHourPaint);
+            canvas.drawText(hourString, x, y, mHourPaint);
             x += hourWidth;
-            canvas.drawText(COLON_STRING, x, Y_OFFSET, mMinutePaint);
+            canvas.drawText(COLON_STRING, x, y, mMinutePaint);
             x += minColonWidth;
-            canvas.drawText(minuteString, x, Y_OFFSET, mMinutePaint);
+            canvas.drawText(minuteString, x, y, mMinutePaint);
             x += minuteWidth;
-            if(!isInAmbientMode()) {
-                if(mShouldDrawColons) {
-                    canvas.drawText(COLON_STRING, x, Y_OFFSET, mSecondPaint);
+            if (!isInAmbientMode()) {
+                if (mShouldDrawColons) {
+                    canvas.drawText(COLON_STRING, x, y, mSecondPaint);
                 }
                 x += mSecondPaint.measureText(COLON_STRING);
                 String secondText = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
-                canvas.drawText(secondText, x, Y_OFFSET, mSecondPaint);
+                canvas.drawText(secondText, x, y, mSecondPaint);
             }
+
+            String dateString = mDateFormat.format(mDate);
+            x = (width - mDatePaint.measureText(dateString)) / 2f;
+            y += mDatePaint.getFontSpacing();
+            canvas.drawText(dateString, x, y, mDatePaint);
         }
 
         @Override
@@ -249,16 +261,12 @@ public class RingFaceService extends CanvasWatchFaceService {
             }
         }
 
-        private Paint createTextPaint(int color) {
-            return createTextPaint(color, NORMAL_TYPEFACE);
-        }
-
-        private Paint createTextPaint(int color, Typeface typeface) {
+        private Paint createTextPaint(int color, float size) {
             Paint paint = new Paint();
             paint.setColor(color);
             paint.setTypeface(NORMAL_TYPEFACE);
             paint.setAntiAlias(true);
-            paint.setTextSize(80f);
+            paint.setTextSize(size);
             return paint;
         }
 
