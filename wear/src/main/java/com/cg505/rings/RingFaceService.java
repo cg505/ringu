@@ -76,6 +76,7 @@ public class RingFaceService extends CanvasWatchFaceService {
         Paint mDatePaint;
         int mMainColor;
         int mSecondColor;
+        Paint mRingPaint;
 
         private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
@@ -133,6 +134,11 @@ public class RingFaceService extends CanvasWatchFaceService {
             mDatePaint = createTextPaint(mMainColor, 30f);
             mDatePaint.setTypeface(BOLD_TYPEFACE);
 
+            mRingPaint = new Paint();
+            mRingPaint.setARGB(255, 255, 255, 255);
+            mRingPaint.setStyle(Paint.Style.STROKE);
+            mRingPaint.setStrokeWidth(5.0f);
+            mRingPaint.setAntiAlias(true);
 
             // allocate a Calendar for time calculation etc
             mCalendar = Calendar.getInstance();
@@ -182,6 +188,7 @@ public class RingFaceService extends CanvasWatchFaceService {
             mShouldDrawColons = mCalendar.get(Calendar.MILLISECOND) % 1000 < 500;
 
             int width = bounds.width();
+            int height = bounds.height();
 
             // draw the bg first
             if (!isInAmbientMode()) {
@@ -234,6 +241,14 @@ public class RingFaceService extends CanvasWatchFaceService {
             x = (width - mDatePaint.measureText(dateString)) / 2f;
             y += mDatePaint.getFontSpacing();
             canvas.drawText(dateString, x, y, mDatePaint);
+
+
+            float radius = (Math.min(width, height) - 5f) / 2f;
+            float centerX = width / 2f;
+            float centerY = width / 2f;
+            drawRing(centerX, centerY, radius, .4f, canvas);
+            radius -= 5f;
+            drawRing(centerX, centerY, radius, .6f, canvas);
         }
 
         @Override
@@ -259,6 +274,13 @@ public class RingFaceService extends CanvasWatchFaceService {
             } else {
                 unregisterReceiver();
             }
+        }
+
+        private void drawRing(float centerX, float centerY, float radius, float percent, Canvas canvas) {
+            canvas.drawArc(centerX - radius, centerY - radius, centerX + radius ,centerY + radius,
+                    -90f, 360f * percent - 90f,
+                    false,
+                    mRingPaint);
         }
 
         private Paint createTextPaint(int color, float size) {
