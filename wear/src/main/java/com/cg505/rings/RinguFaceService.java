@@ -1,4 +1,4 @@
-package com.cg505.rings;
+package com.cg505.ringu;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,7 +33,7 @@ import android.view.SurfaceHolder;
  * Created by cooperc on 12/16/16.
  */
 
-public class RingFaceService extends CanvasWatchFaceService {
+public class RinguFaceService extends CanvasWatchFaceService {
 
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
@@ -116,13 +116,13 @@ public class RingFaceService extends CanvasWatchFaceService {
             super.onCreate(holder);
 
             // configure system ui
-            setWatchFaceStyle(new WatchFaceStyle.Builder(RingFaceService.this)
+            setWatchFaceStyle(new WatchFaceStyle.Builder(RinguFaceService.this)
                     .setPeekOpacityMode(WatchFaceStyle.PEEK_OPACITY_MODE_TRANSLUCENT)
                     .setViewProtectionMode(WatchFaceStyle.PROTECT_WHOLE_SCREEN)
                     .build());
 
             // load bg image
-            Resources resources = RingFaceService.this.getResources();
+            Resources resources = RinguFaceService.this.getResources();
             Drawable backgroundDrawable = resources.getDrawable(R.drawable.bg, null);
             mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
@@ -191,7 +191,7 @@ public class RingFaceService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
-            boolean is24Hour = DateFormat.is24HourFormat(RingFaceService.this);
+            boolean is24Hour = DateFormat.is24HourFormat(RinguFaceService.this);
 
             // colons only for first half of each second
             mShouldDrawColons = mCalendar.get(Calendar.MILLISECOND) % 1000 < 500;
@@ -294,7 +294,7 @@ public class RingFaceService extends CanvasWatchFaceService {
 
         private float batteryPct() {
             // update battery info
-            batteryStatus = RingFaceService.this.registerReceiver(null, batteryIfilter);
+            batteryStatus = RinguFaceService.this.registerReceiver(null, batteryIfilter);
 
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
@@ -329,7 +329,7 @@ public class RingFaceService extends CanvasWatchFaceService {
 
             mRegisteredTimeZoneReceiver = true;
             IntentFilter filter = new IntentFilter((Intent.ACTION_TIMEZONE_CHANGED));
-            RingFaceService.this.registerReceiver(mTimeZoneReceiver, filter);
+            RinguFaceService.this.registerReceiver(mTimeZoneReceiver, filter);
         }
 
         private void unregisterReceiver() {
@@ -338,7 +338,7 @@ public class RingFaceService extends CanvasWatchFaceService {
             }
 
             mRegisteredTimeZoneReceiver = false;
-            RingFaceService.this.unregisterReceiver(mTimeZoneReceiver);
+            RinguFaceService.this.unregisterReceiver(mTimeZoneReceiver);
         }
 
 

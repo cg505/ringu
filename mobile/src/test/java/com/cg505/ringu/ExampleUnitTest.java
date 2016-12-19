@@ -1,4 +1,4 @@
-package com.cg505.rings;
+package com.cg505.ringu;
 
 import org.junit.Test;
 

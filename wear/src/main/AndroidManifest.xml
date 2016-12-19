@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cg505.rings">
+    package="com.cg505.ringu">
 
     <uses-permission
         android:name="android.permission.WAKE_LOCK" />
@@ -12,7 +12,7 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <service
-            android:name=".RingFaceService"
+            android:name=".RinguFaceService"
             android:label="@string/analog_name"
             android:permission="android.permission.BIND_WALLPAPER" >
             <meta-data

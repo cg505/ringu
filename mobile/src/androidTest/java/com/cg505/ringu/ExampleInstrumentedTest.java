@@ -1,4 +1,4 @@
-package com.cg505.rings;
+package com.cg505.ringu;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.cg505.rings", appContext.getPackageName());
+        assertEquals("com.cg505.ringu", appContext.getPackageName());
     }
 }
