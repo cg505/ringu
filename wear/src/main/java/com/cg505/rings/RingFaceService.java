@@ -54,7 +54,7 @@ public class RingFaceService extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
 
         static final int MSG_UPDATE_TIME = 1;
-
+        static final float RING_WIDTH = 7f;
         static final String COLON_STRING = ":";
 
         // calendar/time and other logic
@@ -143,7 +143,7 @@ public class RingFaceService extends CanvasWatchFaceService {
             mRingPaint = new Paint();
             mRingPaint.setARGB(255, 255, 255, 255);
             mRingPaint.setStyle(Paint.Style.STROKE);
-            mRingPaint.setStrokeWidth(5.0f);
+            mRingPaint.setStrokeWidth(RING_WIDTH);
             mRingPaint.setAntiAlias(true);
 
             // allocate a Calendar for time calculation etc
@@ -253,17 +253,17 @@ public class RingFaceService extends CanvasWatchFaceService {
 
 
             // draw the rings
-            float radius = (Math.min(width, height) - 5f) / 2f;
+            float radius = (float) Math.floor((Math.min(width, height) - RING_WIDTH) / 2f);
             if(isInAmbientMode()){
                 // move the rings in so that they don't get moved off screen by
                 // shifting due to burn-in protection
                 radius -= 10f;
             }
             float centerX = width / 2f;
-            float centerY = width / 2f;
+            float centerY = height / 2f;
             drawRing(centerX, centerY, radius, batteryPct(), canvas);
-            radius -= 5f;
-            drawRing(centerX, centerY, radius, .6f, canvas);
+            //radius -= RING_WIDTH;
+            //drawRing(centerX, centerY, radius, .6f, canvas);
         }
 
         @Override
